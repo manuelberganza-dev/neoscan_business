@@ -1,1 +1,13 @@
-// CartItem model — local cart state (product + quantity + price)
+import 'product.dart';
+
+class CartItem {
+  final Product product;
+  final int quantity;
+
+  const CartItem({required this.product, required this.quantity});
+
+  double get lineTotal => product.price * quantity;
+
+  CartItem copyWith({int? quantity}) =>
+      CartItem(product: product, quantity: quantity ?? this.quantity);
+}
