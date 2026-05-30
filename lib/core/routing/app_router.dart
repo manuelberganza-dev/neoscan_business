@@ -4,7 +4,10 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/auth_viewmodel.dart';
 import '../../features/auth/ui/login_screen.dart';
 import '../../features/home/ui/home_screen.dart';
+import '../../features/inventory/models/inventory_item.dart';
+import '../../features/inventory/ui/adjustment_screen.dart';
 import '../../features/inventory/ui/inventory_screen.dart';
+import '../../features/inventory/ui/transfer_screen.dart';
 import '../../features/more/ui/more_screen.dart';
 import '../../features/pos/ui/close_cash_screen.dart';
 import '../../features/pos/ui/open_cash_screen.dart';
@@ -35,6 +38,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/login',
         builder: (ctx, _) => const LoginScreen(),
+      ),
+      // Full-screen Inventory sub-routes (no bottom nav)
+      GoRoute(
+        path: '/inventory/adjustment',
+        builder: (ctx, state) => AdjustmentScreen(
+          preselectedItem: state.extra as InventoryItem?,
+        ),
+      ),
+      GoRoute(
+        path: '/inventory/transfer',
+        builder: (ctx, _) => const TransferScreen(),
       ),
       // Full-screen POS sub-routes (no bottom nav)
       GoRoute(

@@ -7,7 +7,7 @@ final dioClientProvider = Provider<Dio>((ref) {
   final tokenStorage = ref.read(tokenStorageProvider);
 
   final dio = Dio(BaseOptions(
-    baseUrl: AppConfig.baseUrl,
+    baseUrl: AppConfig.apiBaseUrl,
     connectTimeout: const Duration(seconds: 15),
     receiveTimeout: const Duration(seconds: 15),
     headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},

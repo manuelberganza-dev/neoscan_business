@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../models/cash_session.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/currency_utils.dart';
 import '../pos_viewmodel.dart';
@@ -70,13 +71,19 @@ class _PosScreenState extends ConsumerState<PosScreen>
 
   @override
   Widget build(BuildContext context) {
-    final session = ref.watch(cashSessionProvider).valueOrNull;
+    final sessionAsync = ref.watch(cashSessionProvider);
     final cart = ref.watch(cartProvider);
     final isScanning = ref.watch(scannerLoadingProvider);
 
-    // No active session → go open one
-    if (session == null &&
-        ref.watch(cashSessionProvider) is AsyncData) {
+    // Still loading session — show spinner
+    if (sessionAsync is AsyncLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final session = sessionAsync.valueOrNull;
+
+    // Loaded with no active session → go open one
+    if (session == null && sessionAsync is AsyncData) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) context.go('/pos/open-cash');
       });
@@ -221,7 +228,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
 
 class _SummaryBar extends ConsumerWidget {
   final CartState cart;
-  final dynamic session;
+  final CashSession? session;
 
   const _SummaryBar({required this.cart, required this.session});
 
