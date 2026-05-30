@@ -1,5 +1,5 @@
 name: neoscan_business
-description: "A new Flutter project."
+description: "POS + Inventario — NeoSTP Business app."
 publish_to: 'none'
 version: 0.1.0+1
 
@@ -10,10 +10,54 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # State management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Routing
+  go_router: ^15.1.2
+
+  # Networking
+  dio: ^5.8.0+1
+
+  # Secure storage (JWT tokens)
+  flutter_secure_storage: ^9.2.4
+
+  # Models (freezed / json_serializable)
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # Barcode scanning
+  mobile_scanner: ^7.0.1
+
+  # Camera (for OCR invoice photos)
+  camera: ^0.11.1
+
+  # Offline / connectivity
+  connectivity_plus: ^6.1.4
+
+  # Local DB for offline queue
+  drift: ^2.23.1
+  sqlite3_flutter_libs: ^0.5.29
+
+  # Image picking (for OCR from gallery)
+  image_picker: ^1.1.2
+
+  # Utilities
+  intl: ^0.20.2
+  equatable: ^2.0.7
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+
+  # Code generation
+  riverpod_generator: ^2.6.3
+  build_runner: ^2.4.15
+  freezed: ^2.5.8
+  json_serializable: ^6.9.5
+  drift_dev: ^2.23.1
 
 flutter:
   uses-material-design: true
