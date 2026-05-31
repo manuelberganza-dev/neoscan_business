@@ -103,7 +103,7 @@ class _OcrScannerScreenState extends ConsumerState<OcrScannerScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.cloud_upload_outlined),
-            label: Text(state.isUploading ? 'Leyendo' : 'Leer con Gemini'),
+            label: Text(state.isUploading ? 'Procesando' : 'Procesar factura'),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
             ),

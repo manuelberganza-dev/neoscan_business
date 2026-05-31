@@ -58,10 +58,17 @@ class AuthRepository {
   }
 
   Future<void> logout() async {
-    try {
-      await _dio.delete('/auth/logout');
-    } catch (_) {}
+    final token = await _tokenStorage.read();
     await _tokenStorage.delete();
+
+    try {
+      await _dio.delete(
+        '/auth/logout',
+        options: token == null || token.isEmpty
+            ? null
+            : Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } catch (_) {}
   }
 
   Future<User> getCurrentUser() async {

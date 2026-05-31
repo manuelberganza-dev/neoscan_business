@@ -53,8 +53,7 @@ class AuthViewModel extends AsyncNotifier<AuthSession> {
   }
 
   Future<void> logout() async {
-    state = const AsyncLoading();
-    await ref.read(authRepositoryProvider).logout();
     state = const AsyncData(AuthSession.unauthenticated());
+    await ref.read(authRepositoryProvider).logout();
   }
 }

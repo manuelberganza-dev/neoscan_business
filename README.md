@@ -49,9 +49,9 @@ codigo de barras y muestra producto, precio y stock.
 **OCR de factura**
 
 Pantalla de desarrollo para tomar una foto o elegir una imagen de factura desde
-galeria. La app manda la imagen a Gemini Flash y muestra abajo la respuesta JSON
-para validar la lectura. En produccion este flujo debe moverse al backend para
-no exponer llaves ni depender del cliente movil.
+galeria. La app manda la imagen al backend y muestra abajo la respuesta JSON
+para validar la lectura. El proveedor OCR se resuelve del lado servidor para no
+exponer llaves ni depender del cliente movil.
 
 **Notificaciones**
 
@@ -74,12 +74,17 @@ Para usar el backend local desde un telefono Android conectado por USB:
 flutter run --dart-define-from-file=.env
 ```
 
+Si desconectas el telefono o reinicias `adb`, vuelve a ejecutar `adb reverse`.
+Para este modo, `API_BASE_URL` puede quedarse en `http://127.0.0.1:3000/api/v1`
+porque el reverse redirige ese puerto del telefono hacia tu PC.
+
 `.env` no se sube a git. Usa `.env.example` como plantilla.
 
 ## OCR de facturas de El Salvador
 
-Durante desarrollo, la respuesta esperada del OCR debe ser JSON valido con esta
-forma:
+La pantalla sube la imagen a `POST /mobile/ocr_invoice` como multipart con el
+campo `image`. Durante desarrollo, la respuesta esperada del backend debe ser
+JSON valido con esta forma:
 
 ```json
 {
