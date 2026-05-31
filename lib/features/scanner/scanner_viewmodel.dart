@@ -88,18 +88,21 @@ class OcrScannerState {
     this.imagePath,
     this.isUploading = false,
     this.result,
+    this.jsonPreview,
     this.error,
   });
 
   final String? imagePath;
   final bool isUploading;
   final OcrInvoiceResult? result;
+  final String? jsonPreview;
   final String? error;
 
   OcrScannerState copyWith({
     String? imagePath,
     bool? isUploading,
     OcrInvoiceResult? result,
+    String? jsonPreview,
     String? error,
     bool clearImage = false,
     bool clearResult = false,
@@ -108,6 +111,7 @@ class OcrScannerState {
       imagePath: clearImage ? null : imagePath ?? this.imagePath,
       isUploading: isUploading ?? this.isUploading,
       result: clearResult ? null : result ?? this.result,
+      jsonPreview: clearResult ? null : jsonPreview ?? this.jsonPreview,
       error: error,
     );
   }
@@ -134,7 +138,11 @@ class OcrScannerViewModel extends Notifier<OcrScannerState> {
       final result = await ref
           .read(scannerRepositoryProvider)
           .uploadInvoiceImage(imagePath);
-      state = state.copyWith(isUploading: false, result: result);
+      state = state.copyWith(
+        isUploading: false,
+        result: result,
+        jsonPreview: result.jsonText,
+      );
       return true;
     } catch (e) {
       state = state.copyWith(isUploading: false, error: e.toString());

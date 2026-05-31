@@ -33,7 +33,7 @@ class _OcrScannerScreenState extends ConsumerState<OcrScannerScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Factura enviada al backend'),
+        content: Text('Lectura OCR completada'),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -103,7 +103,7 @@ class _OcrScannerScreenState extends ConsumerState<OcrScannerScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.cloud_upload_outlined),
-            label: Text(state.isUploading ? 'Enviando' : 'Enviar al backend'),
+            label: Text(state.isUploading ? 'Leyendo' : 'Leer con Gemini'),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
             ),
@@ -126,7 +126,64 @@ class _OcrScannerScreenState extends ConsumerState<OcrScannerScreen> {
                   'Imagen procesada${state.result!.invoiceNumber != null ? ': ${state.result!.invoiceNumber}' : ''}',
             ),
           ],
+          const SizedBox(height: 14),
+          _JsonPreview(json: state.jsonPreview),
         ],
+      ),
+    );
+  }
+}
+
+class _JsonPreview extends StatelessWidget {
+  const _JsonPreview({required this.json});
+
+  final String? json;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              children: [
+                Icon(Icons.data_object_rounded, color: AppColors.primary),
+                SizedBox(width: 8),
+                Text(
+                  'Respuesta JSON',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(minHeight: 150, maxHeight: 360),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF111827),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: SingleChildScrollView(
+                child: SelectableText(
+                  json ??
+                      '{\n  "esperando": "Toma o selecciona una factura"\n}',
+                  style: const TextStyle(
+                    color: Color(0xFFE5E7EB),
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
