@@ -6,6 +6,11 @@
     <!-- Camera (barcode scanner + OCR) -->
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.flash" android:required="false"/>
+
+    <!-- Gallery fallback for invoice OCR -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
 
     <!-- Vibration (scanner feedback) -->
     <uses-permission android:name="android.permission.VIBRATE"/>

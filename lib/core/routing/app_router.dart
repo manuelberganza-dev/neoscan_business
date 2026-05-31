@@ -14,6 +14,8 @@ import '../../features/pos/ui/close_cash_screen.dart';
 import '../../features/pos/ui/open_cash_screen.dart';
 import '../../features/pos/ui/payment_screen.dart';
 import '../../features/pos/ui/pos_screen.dart';
+import '../../features/scanner/ui/barcode_scanner_screen.dart';
+import '../../features/scanner/ui/ocr_scanner_screen.dart';
 import '../../shared/theme/app_theme.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -55,6 +57,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/pos/close-cash',
         builder: (ctx, _) => const CloseCashScreen(),
+      ),
+      GoRoute(
+        path: '/scanner/barcode',
+        builder: (ctx, _) => const BarcodeScannerScreen(),
+      ),
+      GoRoute(
+        path: '/scanner/ocr',
+        builder: (ctx, _) => const OcrScannerScreen(),
       ),
       ShellRoute(
         builder: (context, state, child) =>

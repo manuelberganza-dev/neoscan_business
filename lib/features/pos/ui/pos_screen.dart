@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
-import '../models/cash_session.dart';
+
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/currency_utils.dart';
+import '../../scanner/models/scanned_product.dart';
+import '../models/cash_session.dart';
+import '../models/product.dart';
 import '../pos_viewmodel.dart';
 import 'widgets/cart_item_tile.dart';
 import 'widgets/quantity_dialog.dart';
@@ -20,8 +22,6 @@ class _PosScreenState extends ConsumerState<PosScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   final _searchCtrl = TextEditingController();
-  bool _showScanner = false;
-  MobileScannerController? _scannerCtrl;
 
   @override
   void initState() {
@@ -33,27 +33,19 @@ class _PosScreenState extends ConsumerState<PosScreen>
   void dispose() {
     _tabController.dispose();
     _searchCtrl.dispose();
-    _scannerCtrl?.dispose();
     super.dispose();
   }
 
-  void _openScanner() {
-    _scannerCtrl = MobileScannerController(
-      detectionSpeed: DetectionSpeed.noDuplicates,
-    );
-    setState(() => _showScanner = true);
+  Future<void> _openScanner() async {
+    final result = await context.push<ScannedProduct>('/scanner/barcode');
+    if (!mounted || result == null) return;
+    await _addProduct(result.product);
   }
 
-  void _closeScanner() {
-    _scannerCtrl?.dispose();
-    _scannerCtrl = null;
-    setState(() => _showScanner = false);
-  }
-
-  Future<void> _onBarcodeDetected(String barcode) async {
-    _closeScanner();
+  Future<void> _onBarcodeSubmitted(String barcode) async {
     final product = await lookupBarcode(ref, barcode);
     if (!mounted) return;
+
     if (product == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -64,6 +56,11 @@ class _PosScreenState extends ConsumerState<PosScreen>
       );
       return;
     }
+
+    await _addProduct(product);
+  }
+
+  Future<void> _addProduct(Product product) async {
     final qty = await showQuantityDialog(context, product);
     if (qty != null && qty > 0) {
       ref.read(cartProvider.notifier).addProduct(product, qty);
@@ -77,27 +74,17 @@ class _PosScreenState extends ConsumerState<PosScreen>
     final cart = ref.watch(cartProvider);
     final isScanning = ref.watch(scannerLoadingProvider);
 
-    // Still loading session — show spinner
     if (sessionAsync is AsyncLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final session = sessionAsync.value;
 
-    // Loaded with no active session → go open one
     if (session == null && sessionAsync is AsyncData) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) context.go('/pos/open-cash');
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    if (_showScanner && _scannerCtrl != null) {
-      return _ScannerOverlay(
-        controller: _scannerCtrl!,
-        onDetect: _onBarcodeDetected,
-        onClose: _closeScanner,
-      );
     }
 
     return Scaffold(
@@ -113,7 +100,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
           ),
           IconButton(
             icon: const Icon(Icons.receipt_long_outlined),
-            onPressed: () {},
+            onPressed: () => context.push('/scanner/ocr'),
           ),
         ],
         bottom: TabBar(
@@ -130,7 +117,6 @@ class _PosScreenState extends ConsumerState<PosScreen>
       ),
       body: Column(
         children: [
-          // Search bar
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: TextField(
@@ -156,24 +142,22 @@ class _PosScreenState extends ConsumerState<PosScreen>
                 ),
               ),
               onSubmitted: (value) {
-                if (value.trim().isNotEmpty) _onBarcodeDetected(value.trim());
+                final barcode = value.trim();
+                if (barcode.isNotEmpty) _onBarcodeSubmitted(barcode);
               },
             ),
           ),
           const SizedBox(height: 12),
-          // Tab content
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: [
-                // Teclado tab
                 const Center(
                   child: Text(
                     'Teclado numérico',
                     style: TextStyle(color: AppColors.textLight),
                   ),
                 ),
-                // Carrito tab
                 cart.items.isEmpty
                     ? const _EmptyCart()
                     : ListView.builder(
@@ -191,7 +175,6 @@ class _PosScreenState extends ConsumerState<PosScreen>
                           );
                         },
                       ),
-                // Clientes tab
                 const Center(
                   child: Text(
                     'Selección de clientes',
@@ -201,7 +184,6 @@ class _PosScreenState extends ConsumerState<PosScreen>
               ],
             ),
           ),
-          // Summary + pay
           if (cart.items.isNotEmpty) _SummaryBar(cart: cart, session: session),
         ],
       ),
@@ -236,10 +218,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
 }
 
 class _SummaryBar extends ConsumerWidget {
+  const _SummaryBar({required this.cart, required this.session});
+
   final CartState cart;
   final CashSession? session;
-
-  const _SummaryBar({required this.cart, required this.session});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -349,66 +331,6 @@ class _EmptyCart extends StatelessWidget {
           Text(
             'Escanea un código o busca un producto',
             style: TextStyle(color: AppColors.textLight, fontSize: 13),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ScannerOverlay extends StatelessWidget {
-  final MobileScannerController controller;
-  final ValueChanged<String> onDetect;
-  final VoidCallback onClose;
-
-  const _ScannerOverlay({
-    required this.controller,
-    required this.onDetect,
-    required this.onClose,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          MobileScanner(
-            controller: controller,
-            onDetect: (capture) {
-              final barcode = capture.barcodes.firstOrNull?.rawValue;
-              if (barcode != null) onDetect(barcode);
-            },
-          ),
-          // Overlay frame
-          Center(
-            child: Container(
-              width: 260,
-              height: 200,
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.primary, width: 3),
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-          ),
-          // Close button
-          Positioned(
-            top: 48,
-            left: 16,
-            child: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white, size: 28),
-              onPressed: onClose,
-            ),
-          ),
-          const Positioned(
-            bottom: 80,
-            left: 0,
-            right: 0,
-            child: Text(
-              'Apunta la cámara al código de barras',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 14),
-            ),
           ),
         ],
       ),

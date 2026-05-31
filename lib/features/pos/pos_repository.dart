@@ -66,11 +66,18 @@ class PosRepository {
 
   Future<Product> scanProduct(String barcode) async {
     try {
-      final response = await _dio.get(
+      final response = await _dio.post(
         '/mobile/scan_product',
-        queryParameters: {'barcode': barcode},
+        data: {
+          'scan': {'barcode': barcode},
+        },
       );
-      return Product.fromJson(_unwrap(response.data));
+      final data = _unwrap(response.data);
+      return Product.fromJson(
+        data['product'] is Map<String, dynamic>
+            ? data['product'] as Map<String, dynamic>
+            : data,
+      );
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) throw 'Producto no encontrado';
       throw dioErrorMessage(e);

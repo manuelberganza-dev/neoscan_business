@@ -85,6 +85,18 @@ class MoreScreen extends ConsumerWidget {
               onTap: () => context.push('/pos/close-cash'),
             ),
           _tile(
+            icon: Icons.qr_code_scanner_rounded,
+            label: 'Escáner',
+            subtitle: 'Productos por código de barras',
+            onTap: () => context.push('/scanner/barcode'),
+          ),
+          _tile(
+            icon: Icons.receipt_long_outlined,
+            label: 'OCR de factura',
+            subtitle: 'Cámara o galería',
+            onTap: () => context.push('/scanner/ocr'),
+          ),
+          _tile(
             icon: Icons.notifications_outlined,
             label: 'Notificaciones',
             onTap: () {},

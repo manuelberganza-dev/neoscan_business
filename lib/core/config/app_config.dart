@@ -29,7 +29,9 @@ class AppConfig {
     if (kIsWeb) return 'http://localhost:3000/api/v1';
 
     return switch (defaultTargetPlatform) {
-      TargetPlatform.android => 'http://10.0.2.2:3000/api/v1',
+      // Physical Android devices connected over USB can reach the laptop
+      // through: adb reverse tcp:3000 tcp:3000
+      TargetPlatform.android => 'http://127.0.0.1:3000/api/v1',
       TargetPlatform.iOS ||
       TargetPlatform.macOS ||
       TargetPlatform.linux ||
