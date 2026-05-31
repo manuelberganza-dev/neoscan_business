@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../auth_viewmodel.dart';
@@ -32,14 +31,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authViewModelProvider);
     final isLoading = authState.isLoading;
 
-    // ── Reactive navigation ──────────────────────────────────────────────────
-    // Using ref.listen avoids the race condition between the router's
-    // refreshListenable and a manual context.go() call.
+    // ── Auth errors ──────────────────────────────────────────────────────────
+    // Auth navigation is handled by GoRouter redirects.
     ref.listen(authViewModelProvider, (prev, next) {
       next.when(
-        data: (session) {
-          if (session.isAuthenticated && mounted) context.go('/home');
-        },
+        data: (_) {},
         error: (e, _) {
           if (mounted) {
             setState(() => _errorMessage = e.toString());

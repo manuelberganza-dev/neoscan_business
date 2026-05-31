@@ -115,18 +115,18 @@ class MoreScreen extends ConsumerWidget {
             onTap: () async {
               final confirm = await showDialog<bool>(
                 context: context,
-                builder: (_) => AlertDialog(
+                builder: (dialogContext) => AlertDialog(
                   title: const Text('Cerrar sesión'),
                   content: const Text(
                     '¿Estás seguro que deseas cerrar sesión?',
                   ),
                   actions: [
                     TextButton(
-                      onPressed: () => Navigator.pop(context, false),
+                      onPressed: () => Navigator.pop(dialogContext, false),
                       child: const Text('Cancelar'),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.pop(context, true),
+                      onPressed: () => Navigator.pop(dialogContext, true),
                       child: const Text(
                         'Salir',
                         style: TextStyle(color: AppColors.danger),
@@ -136,8 +136,9 @@ class MoreScreen extends ConsumerWidget {
                 ),
               );
               if (confirm == true && context.mounted) {
+                await WidgetsBinding.instance.endOfFrame;
+                if (!context.mounted) return;
                 await ref.read(authViewModelProvider.notifier).logout();
-                if (context.mounted) context.go('/login');
               }
             },
           ),
