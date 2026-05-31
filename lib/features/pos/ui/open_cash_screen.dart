@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../pos_viewmodel.dart';
@@ -32,13 +33,16 @@ class _OpenCashScreenState extends ConsumerState<OpenCashScreen> {
       );
       return;
     }
+
     await ref
         .read(cashSessionProvider.notifier)
         .open(
           amount,
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
         );
+
     if (!mounted) return;
+
     final state = ref.read(cashSessionProvider);
     state.when(
       data: (_) => context.go('/pos'),
@@ -53,94 +57,104 @@ class _OpenCashScreenState extends ConsumerState<OpenCashScreen> {
     );
   }
 
+  void _leaveOpenCash() {
+    context.go('/home');
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(cashSessionProvider) is AsyncLoading;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Abrir caja'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => context.pop(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _leaveOpenCash();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Abrir caja'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            onPressed: _leaveOpenCash,
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _sectionCard(
-              title: 'Información de caja',
-              children: [
-                _infoRow(
-                  Icons.point_of_sale_outlined,
-                  'Caja',
-                  'Caja 1 - Principal',
-                ),
-                const Divider(),
-                _infoRow(Icons.store_outlined, 'Sucursal', 'Sucursal Centro'),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _sectionCard(
-              title: 'Monto inicial',
-              children: [
-                TextField(
-                  controller: _amountCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _sectionCard(
+                title: 'Información de caja',
+                children: [
+                  _infoRow(
+                    Icons.point_of_sale_outlined,
+                    'Caja',
+                    'Caja 1 - Principal',
                   ),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                      RegExp(r'^\d+\.?\d{0,2}'),
+                  const Divider(),
+                  _infoRow(Icons.store_outlined, 'Sucursal', 'Sucursal Centro'),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _sectionCard(
+                title: 'Monto inicial',
+                children: [
+                  TextField(
+                    controller: _amountCtrl,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
                     ),
-                  ],
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                  decoration: const InputDecoration(
-                    prefixText: '\$ ',
-                    prefixStyle: TextStyle(
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}'),
+                      ),
+                    ],
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    filled: false,
+                    decoration: const InputDecoration(
+                      prefixText: '\$ ',
+                      prefixStyle: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      filled: false,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _sectionCard(
-              title: 'Notas (opcional)',
-              children: [
-                TextField(
-                  controller: _notesCtrl,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    hintText: 'Ingresa una nota',
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    filled: false,
+                ],
+              ),
+              const SizedBox(height: 16),
+              _sectionCard(
+                title: 'Notas (opcional)',
+                children: [
+                  TextField(
+                    controller: _notesCtrl,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      hintText: 'Ingresa una nota',
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      filled: false,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 32),
-            PrimaryButton(
-              label: 'Abrir caja',
-              isLoading: isLoading,
-              onPressed: _open,
-              icon: Icons.lock_open_rounded,
-            ),
-          ],
+                ],
+              ),
+              const SizedBox(height: 32),
+              PrimaryButton(
+                label: 'Abrir caja',
+                isLoading: isLoading,
+                onPressed: _open,
+                icon: Icons.lock_open_rounded,
+              ),
+            ],
+          ),
         ),
       ),
     );

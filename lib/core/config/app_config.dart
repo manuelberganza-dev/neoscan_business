@@ -8,12 +8,18 @@ final appConfigProvider = Provider<AppConfig>((ref) {
 class AppConfig {
   const AppConfig({
     required this.apiBaseUrl,
+    required this.geminiApiKey,
+    required this.geminiModel,
     this.requestTimeout = const Duration(seconds: 20),
   });
 
   static const _apiBaseUrlOverride = String.fromEnvironment('API_BASE_URL');
+  static const _geminiApiKeyOverride = String.fromEnvironment('GEMINI_API_KEY');
+  static const _geminiModelOverride = String.fromEnvironment('GEMINI_MODEL');
 
   final String apiBaseUrl;
+  final String geminiApiKey;
+  final String geminiModel;
   final Duration requestTimeout;
 
   String get actionCableBaseUrl {
@@ -30,6 +36,11 @@ class AppConfig {
     return AppConfig(
       apiBaseUrl: _normalizeBaseUrl(
         override.isNotEmpty ? override : _defaultApiBaseUrl(),
+      ),
+      geminiApiKey: _envValue(_geminiApiKeyOverride),
+      geminiModel: _envValue(
+        _geminiModelOverride,
+        fallback: 'gemini-flash-latest',
       ),
     );
   }
@@ -55,5 +66,11 @@ class AppConfig {
       url = url.substring(0, url.length - 1);
     }
     return url;
+  }
+
+  static String _envValue(String dartDefineValue, {String fallback = ''}) {
+    final value = dartDefineValue.trim();
+    if (value.isNotEmpty) return value;
+    return fallback;
   }
 }

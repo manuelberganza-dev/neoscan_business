@@ -1,17 +1,26 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/offline/connectivity_status.dart';
+import '../../core/offline/offline_queue_repository.dart';
 import '../../core/network/dio_client.dart';
 import 'models/cash_session.dart';
 import 'models/product.dart';
 import 'models/sale.dart';
 
 final posRepositoryProvider = Provider<PosRepository>(
-  (ref) => PosRepository(ref.read(dioClientProvider)),
+  (ref) => PosRepository(
+    ref.watch(dioClientProvider),
+    ref.watch(offlineQueueRepositoryProvider),
+    ref.watch(isOfflineProvider),
+  ),
 );
 
 class PosRepository {
   final Dio _dio;
-  const PosRepository(this._dio);
+  final OfflineQueueRepository _offlineQueue;
+  final bool _isOffline;
+
+  const PosRepository(this._dio, this._offlineQueue, this._isOffline);
 
   // ── Cash session ──────────────────────────────────────────────────────────
 
@@ -87,11 +96,39 @@ class PosRepository {
   // ── Sales ─────────────────────────────────────────────────────────────────
 
   Future<void> processSale(SaleRequest request) async {
+    if (_isOffline) {
+      await _queueSale(request);
+      return;
+    }
+
     try {
       await _dio.post('/sales', data: request.toJson());
     } on DioException catch (e) {
+      if (_canQueue(e)) {
+        await _queueSale(request);
+        return;
+      }
       throw dioErrorMessage(e);
     }
+  }
+
+  Future<void> _queueSale(SaleRequest request) {
+    return _offlineQueue.enqueue(
+      method: 'POST',
+      endpoint: '/sales',
+      payload: request.toJson(),
+      operationType: 'sale',
+    );
+  }
+
+  bool _canQueue(DioException e) {
+    return switch (e.type) {
+      DioExceptionType.connectionTimeout ||
+      DioExceptionType.sendTimeout ||
+      DioExceptionType.receiveTimeout ||
+      DioExceptionType.connectionError => true,
+      _ => false,
+    };
   }
 
   Map<String, dynamic> _unwrap(dynamic data) {
