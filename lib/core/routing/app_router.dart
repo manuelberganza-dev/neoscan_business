@@ -10,6 +10,7 @@ import '../../features/inventory/ui/adjustment_screen.dart';
 import '../../features/inventory/ui/inventory_screen.dart';
 import '../../features/inventory/ui/transfer_screen.dart';
 import '../../features/more/ui/more_screen.dart';
+import '../../features/notifications/ui/notifications_screen.dart';
 import '../../features/pos/ui/close_cash_screen.dart';
 import '../../features/pos/ui/open_cash_screen.dart';
 import '../../features/pos/ui/payment_screen.dart';
@@ -65,6 +66,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/scanner/ocr',
         builder: (ctx, _) => const OcrScannerScreen(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (ctx, _) => const NotificationsScreen(),
       ),
       ShellRoute(
         builder: (context, state, child) =>

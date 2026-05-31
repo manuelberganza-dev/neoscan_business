@@ -99,7 +99,7 @@ class MoreScreen extends ConsumerWidget {
           _tile(
             icon: Icons.notifications_outlined,
             label: 'Notificaciones',
-            onTap: () {},
+            onTap: () => context.push('/notifications'),
           ),
           _tile(
             icon: Icons.settings_outlined,

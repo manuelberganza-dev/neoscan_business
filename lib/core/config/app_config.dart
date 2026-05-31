@@ -16,6 +16,15 @@ class AppConfig {
   final String apiBaseUrl;
   final Duration requestTimeout;
 
+  String get actionCableBaseUrl {
+    final uri = Uri.parse(apiBaseUrl);
+    final scheme = uri.scheme == 'https' ? 'wss' : 'ws';
+    final path = uri.path.replaceFirst(RegExp(r'/api/v1/?$'), '');
+    return uri
+        .replace(scheme: scheme, path: '$path/cable', queryParameters: null)
+        .toString();
+  }
+
   factory AppConfig.fromEnvironment() {
     final override = _apiBaseUrlOverride.trim();
     return AppConfig(
