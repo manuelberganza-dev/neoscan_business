@@ -8,7 +8,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authViewModelProvider).valueOrNull;
+    final user = ref.watch(currentUserProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -22,7 +22,9 @@ class HomeScreen extends ConsumerWidget {
               Text(
                 user!.branch!,
                 style: const TextStyle(
-                    fontSize: 12, color: AppColors.textSecondary),
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
               ),
           ],
         ),
@@ -37,15 +39,15 @@ class HomeScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.bar_chart_rounded,
-                size: 64, color: AppColors.textLight),
+            Icon(Icons.bar_chart_rounded, size: 64, color: AppColors.textLight),
             SizedBox(height: 16),
             Text(
               'Dashboard',
               style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary),
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+              ),
             ),
             SizedBox(height: 8),
             Text(

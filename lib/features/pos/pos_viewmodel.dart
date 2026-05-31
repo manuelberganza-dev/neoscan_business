@@ -9,7 +9,8 @@ import 'pos_repository.dart';
 
 final cashSessionProvider =
     AsyncNotifierProvider<CashSessionViewModel, CashSession?>(
-        CashSessionViewModel.new);
+      CashSessionViewModel.new,
+    );
 
 class CashSessionViewModel extends AsyncNotifier<CashSession?> {
   @override
@@ -18,19 +19,24 @@ class CashSessionViewModel extends AsyncNotifier<CashSession?> {
 
   Future<void> open(double initialAmount, {String? notes}) async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => ref
-        .read(posRepositoryProvider)
-        .openSession(initialAmount: initialAmount, notes: notes));
+    state = await AsyncValue.guard(
+      () => ref
+          .read(posRepositoryProvider)
+          .openSession(initialAmount: initialAmount, notes: notes),
+    );
   }
 
   Future<CashSession?> close({String? notes}) async {
-    final session = state.valueOrNull;
+    final session = state.value;
     if (session == null) return null;
     state = const AsyncLoading();
-    final result = await AsyncValue.guard(() =>
-        ref.read(posRepositoryProvider).closeSession(session.id, notes: notes));
+    final result = await AsyncValue.guard(
+      () => ref
+          .read(posRepositoryProvider)
+          .closeSession(session.id, notes: notes),
+    );
     state = const AsyncData(null);
-    return result.valueOrNull;
+    return result.value;
   }
 }
 
@@ -47,8 +53,7 @@ class CartState {
     this.error,
   });
 
-  double get subtotal =>
-      items.fold(0, (sum, item) => sum + item.lineTotal);
+  double get subtotal => items.fold(0, (sum, item) => sum + item.lineTotal);
   double get tax => subtotal * 0.13;
   double get total => subtotal + tax;
 
@@ -56,16 +61,16 @@ class CartState {
     List<CartItem>? items,
     bool? isProcessing,
     String? error,
-  }) =>
-      CartState(
-        items: items ?? this.items,
-        isProcessing: isProcessing ?? this.isProcessing,
-        error: error,
-      );
+  }) => CartState(
+    items: items ?? this.items,
+    isProcessing: isProcessing ?? this.isProcessing,
+    error: error,
+  );
 }
 
-final cartProvider =
-    NotifierProvider<CartViewModel, CartState>(CartViewModel.new);
+final cartProvider = NotifierProvider<CartViewModel, CartState>(
+  CartViewModel.new,
+);
 
 class CartViewModel extends Notifier<CartState> {
   @override
@@ -82,7 +87,10 @@ class CartViewModel extends Notifier<CartState> {
       state = state.copyWith(items: updated);
     } else {
       state = state.copyWith(
-        items: [...state.items, CartItem(product: product, quantity: quantity)],
+        items: [
+          ...state.items,
+          CartItem(product: product, quantity: quantity),
+        ],
       );
     }
   }
@@ -94,8 +102,10 @@ class CartViewModel extends Notifier<CartState> {
     }
     state = state.copyWith(
       items: state.items
-          .map((i) =>
-              i.product.id == productId ? i.copyWith(quantity: quantity) : i)
+          .map(
+            (i) =>
+                i.product.id == productId ? i.copyWith(quantity: quantity) : i,
+          )
           .toList(),
     );
   }
@@ -114,7 +124,9 @@ class CartViewModel extends Notifier<CartState> {
   }) async {
     state = state.copyWith(isProcessing: true, error: null);
     try {
-      await ref.read(posRepositoryProvider).processSale(
+      await ref
+          .read(posRepositoryProvider)
+          .processSale(
             SaleRequest(
               cashSessionId: cashSessionId,
               items: state.items,
@@ -132,15 +144,26 @@ class CartViewModel extends Notifier<CartState> {
 
 // ── Scanner helper ────────────────────────────────────────────────────────────
 
-final scannerLoadingProvider = StateProvider<bool>((ref) => false);
+final scannerLoadingProvider = NotifierProvider<ScannerLoadingViewModel, bool>(
+  ScannerLoadingViewModel.new,
+);
+
+class ScannerLoadingViewModel extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void setLoading(bool value) {
+    state = value;
+  }
+}
 
 Future<Product?> lookupBarcode(WidgetRef ref, String barcode) async {
-  ref.read(scannerLoadingProvider.notifier).state = true;
+  ref.read(scannerLoadingProvider.notifier).setLoading(true);
   try {
     return await ref.read(posRepositoryProvider).scanProduct(barcode);
   } catch (_) {
     return null;
   } finally {
-    ref.read(scannerLoadingProvider.notifier).state = false;
+    ref.read(scannerLoadingProvider.notifier).setLoading(false);
   }
 }

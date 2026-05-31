@@ -53,12 +53,13 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
       return;
     }
     if (_selectedItem!.quantity < qty) {
-      _showError(
-          'Stock insuficiente. Disponible: ${_selectedItem!.quantity}');
+      _showError('Stock insuficiente. Disponible: ${_selectedItem!.quantity}');
       return;
     }
 
-    final ok = await ref.read(transferViewModelProvider.notifier).submit(
+    final ok = await ref
+        .read(transferViewModelProvider.notifier)
+        .submit(
           TransferRequest(
             sourceWarehouseId: _sourceWarehouse!.id,
             destinationWarehouseId: _destinationWarehouse!.id,
@@ -83,7 +84,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
     } else {
       final err =
           ref.read(transferViewModelProvider).error?.toString() ??
-              'Error al realizar la transferencia';
+          'Error al realizar la transferencia';
       _showError(err);
     }
   }
@@ -103,15 +104,15 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
   Widget build(BuildContext context) {
     final warehousesAsync = ref.watch(warehousesProvider);
     final inventoryAsync = ref.watch(inventoryProvider);
-    final isLoading =
-        ref.watch(transferViewModelProvider) is AsyncLoading;
+    final isLoading = ref.watch(transferViewModelProvider) is AsyncLoading;
 
-    final warehouses = warehousesAsync.valueOrNull ?? [];
+    final warehouses = warehousesAsync.value ?? [];
     // Only show items from source warehouse
-    final items = (inventoryAsync.valueOrNull ?? [])
-        .where((i) =>
-            _sourceWarehouse == null ||
-            i.warehouseId == _sourceWarehouse!.id)
+    final items = (inventoryAsync.value ?? [])
+        .where(
+          (i) =>
+              _sourceWarehouse == null || i.warehouseId == _sourceWarehouse!.id,
+        )
         .toList();
 
     return Scaffold(
@@ -139,15 +140,19 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
                       hint: 'Origen',
                       onChanged: (w) => setState(() {
                         _sourceWarehouse = w;
-                        _selectedItem = null; // reset product when source changes
+                        _selectedItem =
+                            null; // reset product when source changes
                       }),
                     ),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Icon(Icons.arrow_forward_rounded,
-                      color: AppColors.primary, size: 28),
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    color: AppColors.primary,
+                    size: 28,
+                  ),
                 ),
                 Expanded(
                   child: _sectionCard(
@@ -173,27 +178,35 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
                 child: DropdownButton<InventoryItem>(
                   value: _selectedItem,
                   isExpanded: true,
-                  hint: const Text('Selecciona un producto',
-                      style: TextStyle(color: AppColors.textLight)),
+                  hint: const Text(
+                    'Selecciona un producto',
+                    style: TextStyle(color: AppColors.textLight),
+                  ),
                   items: items
-                      .map((i) => DropdownMenuItem<InventoryItem>(
-                            value: i,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(i.productName,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w500)),
-                                Text(
-                                  'Stock: ${i.quantity}  ·  SKU: ${i.sku}',
-                                  style: const TextStyle(
-                                      fontSize: 11,
-                                      color: AppColors.textLight),
+                      .map(
+                        (i) => DropdownMenuItem<InventoryItem>(
+                          value: i,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                i.productName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
                                 ),
-                              ],
-                            ),
-                          ))
+                              ),
+                              Text(
+                                'Stock: ${i.quantity}  ·  SKU: ${i.sku}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.textLight,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
                       .toList(),
                   onChanged: (i) => setState(() => _selectedItem = i),
                 ),
@@ -206,7 +219,9 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
                 child: Text(
                   'Stock disponible: ${_selectedItem!.quantity} unidades',
                   style: const TextStyle(
-                      fontSize: 12, color: AppColors.textSecondary),
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ),
             ],
@@ -227,7 +242,9 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.w700),
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                      ),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
@@ -337,15 +354,17 @@ class _WarehouseDropdown extends StatelessWidget {
       child: DropdownButton<Warehouse>(
         value: value,
         isExpanded: true,
-        hint: Text(hint,
-            style: const TextStyle(
-                fontSize: 13, color: AppColors.textLight)),
+        hint: Text(
+          hint,
+          style: const TextStyle(fontSize: 13, color: AppColors.textLight),
+        ),
         items: warehouses
-            .map((w) => DropdownMenuItem<Warehouse>(
-                  value: w,
-                  child: Text(w.name,
-                      style: const TextStyle(fontSize: 13)),
-                ))
+            .map(
+              (w) => DropdownMenuItem<Warehouse>(
+                value: w,
+                child: Text(w.name, style: const TextStyle(fontSize: 13)),
+              ),
+            )
             .toList(),
         onChanged: onChanged,
       ),

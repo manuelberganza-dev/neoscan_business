@@ -51,11 +51,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          _StockTab(),
-          _AdjustmentsTab(),
-          _TransfersTab(),
-        ],
+        children: const [_StockTab(), _AdjustmentsTab(), _TransfersTab()],
       ),
     );
   }
@@ -79,24 +75,25 @@ class _StockTab extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
           child: warehousesAsync.when(
             loading: () => const LinearProgressIndicator(),
-            error: (e, _) => Text(e.toString(),
-                style: const TextStyle(color: AppColors.danger)),
+            error: (e, _) => Text(
+              e.toString(),
+              style: const TextStyle(color: AppColors.danger),
+            ),
             data: (warehouses) => _WarehouseDropdown(
               warehouses: warehouses,
               selected: selected,
               onChanged: (w) =>
-                  ref.read(selectedWarehouseProvider.notifier).state = w,
+                  ref.read(selectedWarehouseProvider.notifier).select(w),
             ),
           ),
         ),
         // Stats row
-        inventoryAsync.whenData((items) => _StatsRow(items: items)).valueOrNull ??
+        inventoryAsync.whenData((items) => _StatsRow(items: items)).value ??
             const SizedBox.shrink(),
         // Product list
         Expanded(
           child: inventoryAsync.when(
-            loading: () =>
-                const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => _ErrorState(
               message: e.toString(),
               onRetry: () => ref.read(inventoryProvider.notifier).refresh(),
@@ -149,15 +146,22 @@ class _WarehouseDropdown extends StatelessWidget {
         child: DropdownButton<Warehouse?>(
           value: selected,
           isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded,
-              color: AppColors.textSecondary),
+          icon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: AppColors.textSecondary,
+          ),
           hint: const Row(
             children: [
-              Icon(Icons.warehouse_outlined,
-                  size: 18, color: AppColors.textSecondary),
+              Icon(
+                Icons.warehouse_outlined,
+                size: 18,
+                color: AppColors.textSecondary,
+              ),
               SizedBox(width: 8),
-              Text('Todas las bodegas',
-                  style: TextStyle(color: AppColors.textSecondary)),
+              Text(
+                'Todas las bodegas',
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
             ],
           ),
           items: [
@@ -165,17 +169,22 @@ class _WarehouseDropdown extends StatelessWidget {
               value: null,
               child: Text('Todas las bodegas'),
             ),
-            ...warehouses.map((w) => DropdownMenuItem<Warehouse?>(
-                  value: w,
-                  child: Row(
-                    children: [
-                      const Icon(Icons.warehouse_outlined,
-                          size: 18, color: AppColors.textSecondary),
-                      const SizedBox(width: 8),
-                      Text(w.name),
-                    ],
-                  ),
-                )),
+            ...warehouses.map(
+              (w) => DropdownMenuItem<Warehouse?>(
+                value: w,
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.warehouse_outlined,
+                      size: 18,
+                      color: AppColors.textSecondary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(w.name),
+                  ],
+                ),
+              ),
+            ),
           ],
           onChanged: onChanged,
         ),
@@ -190,7 +199,9 @@ class _StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final available = items.where((i) => i.status == StockStatus.available).length;
+    final available = items
+        .where((i) => i.status == StockStatus.available)
+        .length;
     final low = items.where((i) => i.status == StockStatus.low).length;
     final out = items.where((i) => i.status == StockStatus.out).length;
 
@@ -198,7 +209,11 @@ class _StatsRow extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       child: Row(
         children: [
-          _StatChip(label: 'Disponibles', count: available, status: StockStatus.available),
+          _StatChip(
+            label: 'Disponibles',
+            count: available,
+            status: StockStatus.available,
+          ),
           const SizedBox(width: 8),
           _StatChip(label: 'Bajo mínimo', count: low, status: StockStatus.low),
           const SizedBox(width: 8),
@@ -213,7 +228,11 @@ class _StatChip extends StatelessWidget {
   final String label;
   final int count;
   final StockStatus status;
-  const _StatChip({required this.label, required this.count, required this.status});
+  const _StatChip({
+    required this.label,
+    required this.count,
+    required this.status,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -229,8 +248,7 @@ class _StatChip extends StatelessWidget {
           children: [
             Text(
               '$count',
-              style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.w700),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             StockStatusBadge(status: status),
           ],
@@ -249,16 +267,24 @@ class _EmptyInventory extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.inventory_2_outlined,
-              size: 56, color: AppColors.textLight),
+          Icon(
+            Icons.inventory_2_outlined,
+            size: 56,
+            color: AppColors.textLight,
+          ),
           SizedBox(height: 12),
-          Text('Sin productos en inventario',
-              style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w500)),
+          Text(
+            'Sin productos en inventario',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           SizedBox(height: 6),
-          Text('Selecciona otra bodega o recarga',
-              style: TextStyle(color: AppColors.textLight, fontSize: 13)),
+          Text(
+            'Selecciona otra bodega o recarga',
+            style: TextStyle(color: AppColors.textLight, fontSize: 13),
+          ),
         ],
       ),
     );
@@ -278,13 +304,17 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.cloud_off_outlined,
-                size: 48, color: AppColors.textLight),
+            const Icon(
+              Icons.cloud_off_outlined,
+              size: 48,
+              color: AppColors.textLight,
+            ),
             const SizedBox(height: 12),
-            Text(message,
-                textAlign: TextAlign.center,
-                style:
-                    const TextStyle(color: AppColors.textSecondary)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.textSecondary),
+            ),
             const SizedBox(height: 16),
             OutlinedButton.icon(
               onPressed: onRetry,
@@ -311,14 +341,19 @@ class _AdjustmentsTab extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.tune_rounded, size: 56, color: AppColors.textLight),
+            const Icon(
+              Icons.tune_rounded,
+              size: 56,
+              color: AppColors.textLight,
+            ),
             const SizedBox(height: 16),
             const Text(
               'Ajuste rápido',
               style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary),
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(height: 8),
             const Text(
@@ -355,15 +390,19 @@ class _TransfersTab extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.swap_horiz_rounded,
-                size: 56, color: AppColors.textLight),
+            const Icon(
+              Icons.swap_horiz_rounded,
+              size: 56,
+              color: AppColors.textLight,
+            ),
             const SizedBox(height: 16),
             const Text(
               'Transferencia entre bodegas',
               style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary),
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(height: 8),
             const Text(

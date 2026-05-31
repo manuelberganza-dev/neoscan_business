@@ -9,9 +9,21 @@ class StockStatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, bg, fg) = switch (status) {
-      StockStatus.available => ('Disponible', const Color(0xFFDCFCE7), const Color(0xFF16A34A)),
-      StockStatus.low       => ('Bajo mínimo', const Color(0xFFFEF9C3), const Color(0xFFCA8A04)),
-      StockStatus.out       => ('Agotado',     const Color(0xFFFEE2E2), const Color(0xFFDC2626)),
+      StockStatus.available => (
+        'Disponible',
+        const Color(0xFFDCFCE7),
+        const Color(0xFF16A34A),
+      ),
+      StockStatus.low => (
+        'Bajo mínimo',
+        const Color(0xFFFEF9C3),
+        const Color(0xFFCA8A04),
+      ),
+      StockStatus.out => (
+        'Agotado',
+        const Color(0xFFFEE2E2),
+        const Color(0xFFDC2626),
+      ),
     };
 
     return Container(
@@ -22,11 +34,7 @@ class StockStatusBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: fg,
-        ),
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg),
       ),
     );
   }

@@ -4,10 +4,12 @@ import '../../core/network/dio_client.dart';
 import '../../core/security/token_storage.dart';
 import 'models/user.dart';
 
-final authRepositoryProvider = Provider<AuthRepository>((ref) => AuthRepository(
-      ref.read(dioClientProvider),
-      ref.read(tokenStorageProvider),
-    ));
+final authRepositoryProvider = Provider<AuthRepository>(
+  (ref) => AuthRepository(
+    ref.read(dioClientProvider),
+    ref.read(tokenStorageProvider),
+  ),
+);
 
 class AuthRepository {
   final Dio _dio;
@@ -17,9 +19,12 @@ class AuthRepository {
 
   Future<User> login(String email, String password) async {
     try {
-      final response = await _dio.post('/auth/login', data: {
-        'user': {'email': email, 'password': password},
-      });
+      final response = await _dio.post(
+        '/auth/login',
+        data: {
+          'user': {'email': email, 'password': password},
+        },
+      );
 
       // ── Token extraction ─────────────────────────────────────────────────
       // 1. Devise JWT puts token in the Authorization response header
@@ -28,7 +33,8 @@ class AuthRepository {
       // 2. Some custom backends return it in the body
       if (token == null && response.data is Map) {
         final body = response.data as Map;
-        token = body['token'] as String? ??
+        token =
+            body['token'] as String? ??
             body['jwt'] as String? ??
             body['access_token'] as String?;
       }
@@ -43,7 +49,8 @@ class AuthRepository {
           ? response.data as Map<String, dynamic>
           : <String, dynamic>{};
 
-      final userData = (body['data'] ?? body['user'] ?? body) as Map<String, dynamic>;
+      final userData =
+          (body['data'] ?? body['user'] ?? body) as Map<String, dynamic>;
       return User.fromJson(userData);
     } on DioException catch (e) {
       throw dioErrorMessage(e);
@@ -63,7 +70,8 @@ class AuthRepository {
       final body = response.data is Map<String, dynamic>
           ? response.data as Map<String, dynamic>
           : <String, dynamic>{};
-      final userData = (body['data'] ?? body['user'] ?? body) as Map<String, dynamic>;
+      final userData =
+          (body['data'] ?? body['user'] ?? body) as Map<String, dynamic>;
       return User.fromJson(userData);
     } on DioException catch (e) {
       throw dioErrorMessage(e);

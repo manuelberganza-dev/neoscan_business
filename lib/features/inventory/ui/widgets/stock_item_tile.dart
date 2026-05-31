@@ -30,8 +30,11 @@ class StockItemTile extends StatelessWidget {
                 color: AppColors.background,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.inventory_2_outlined,
-                  size: 22, color: AppColors.textLight),
+              child: const Icon(
+                Icons.inventory_2_outlined,
+                size: 22,
+                color: AppColors.textLight,
+              ),
             ),
             const SizedBox(width: 12),
             // Product info
@@ -42,9 +45,10 @@ class StockItemTile extends StatelessWidget {
                   Text(
                     item.productName,
                     style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: AppColors.textPrimary),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: AppColors.textPrimary,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -52,14 +56,12 @@ class StockItemTile extends StatelessWidget {
                   Text(
                     'SKU: ${item.sku}',
                     style: const TextStyle(
-                        fontSize: 11, color: AppColors.textLight),
+                      fontSize: 11,
+                      color: AppColors.textLight,
+                    ),
                   ),
                   const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      StockStatusBadge(status: item.status),
-                    ],
-                  ),
+                  Row(children: [StockStatusBadge(status: item.status)]),
                 ],
               ),
             ),
@@ -78,9 +80,10 @@ class StockItemTile extends StatelessWidget {
                         : AppColors.textPrimary,
                   ),
                 ),
-                const Text('unidades',
-                    style: TextStyle(
-                        fontSize: 10, color: AppColors.textLight)),
+                const Text(
+                  'unidades',
+                  style: TextStyle(fontSize: 10, color: AppColors.textLight),
+                ),
                 if (onAdjust != null) ...[
                   const SizedBox(height: 4),
                   GestureDetector(
@@ -88,9 +91,10 @@ class StockItemTile extends StatelessWidget {
                     child: const Text(
                       'Ajustar',
                       style: TextStyle(
-                          fontSize: 11,
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600),
+                        fontSize: 11,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],

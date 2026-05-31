@@ -30,15 +30,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authViewModelProvider);
-    final isLoading = authState is AsyncLoading;
+    final isLoading = authState.isLoading;
 
     // ── Reactive navigation ──────────────────────────────────────────────────
     // Using ref.listen avoids the race condition between the router's
     // refreshListenable and a manual context.go() call.
     ref.listen(authViewModelProvider, (prev, next) {
       next.when(
-        data: (user) {
-          if (user != null && mounted) context.go('/home');
+        data: (session) {
+          if (session.isAuthenticated && mounted) context.go('/home');
         },
         error: (e, _) {
           if (mounted) {
@@ -93,16 +93,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textInputAction: TextInputAction.next,
                   autocorrect: false,
                   onChanged: (_) {
-                    if (_errorMessage != null) setState(() => _errorMessage = null);
+                    if (_errorMessage != null) {
+                      setState(() => _errorMessage = null);
+                    }
                   },
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Ingresa tu correo';
+                    if (v == null || v.trim().isEmpty) {
+                      return 'Ingresa tu correo';
+                    }
                     return null;
                   },
                   decoration: const InputDecoration(
                     hintText: 'correo@ejemplo.com',
-                    prefixIcon: Icon(Icons.mail_outline_rounded,
-                        color: AppColors.textLight),
+                    prefixIcon: Icon(
+                      Icons.mail_outline_rounded,
+                      color: AppColors.textLight,
+                    ),
                   ),
                 ),
 
@@ -117,7 +123,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _submit(),
                   onChanged: (_) {
-                    if (_errorMessage != null) setState(() => _errorMessage = null);
+                    if (_errorMessage != null) {
+                      setState(() => _errorMessage = null);
+                    }
                   },
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'Ingresa tu contraseña';
@@ -125,8 +133,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   },
                   decoration: InputDecoration(
                     hintText: '••••••••',
-                    prefixIcon: const Icon(Icons.lock_outline_rounded,
-                        color: AppColors.textLight),
+                    prefixIcon: const Icon(
+                      Icons.lock_outline_rounded,
+                      color: AppColors.textLight,
+                    ),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
@@ -163,26 +173,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.danger.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                          color: AppColors.danger.withValues(alpha: 0.3)),
+                        color: AppColors.danger.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.error_outline_rounded,
-                            color: AppColors.danger, size: 18),
+                        const Icon(
+                          Icons.error_outline_rounded,
+                          color: AppColors.danger,
+                          size: 18,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             _errorMessage!,
                             style: const TextStyle(
-                                color: AppColors.danger,
-                                fontSize: 13,
-                                height: 1.4),
+                              color: AppColors.danger,
+                              fontSize: 13,
+                              height: 1.4,
+                            ),
                           ),
                         ),
                       ],
@@ -209,8 +226,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       onChanged: (v) =>
                           setState(() => _rememberMe = v ?? false),
                     ),
-                    const Text('Recordarme',
-                        style: TextStyle(color: AppColors.textSecondary)),
+                    const Text(
+                      'Recordarme',
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
                   ],
                 ),
               ],
@@ -224,19 +243,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _errorMessage = null);
-    await ref.read(authViewModelProvider.notifier).login(
-          _emailCtrl.text.trim(),
-          _passwordCtrl.text,
-        );
+    await ref
+        .read(authViewModelProvider.notifier)
+        .login(_emailCtrl.text.trim(), _passwordCtrl.text);
     // Navigation is handled by ref.listen above — no manual context.go needed.
   }
 
   Widget _label(String text) => Text(
-        text,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-        ),
-      );
+    text,
+    style: const TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      color: AppColors.textPrimary,
+    ),
+  );
 }

@@ -31,12 +31,15 @@ class PosRepository {
     String? notes,
   }) async {
     try {
-      final response = await _dio.post('/cash_sessions', data: {
-        'cash_session': {
-          'initial_amount': initialAmount,
-          if (notes != null && notes.isNotEmpty) 'notes': notes,
+      final response = await _dio.post(
+        '/cash_sessions',
+        data: {
+          'cash_session': {
+            'initial_amount': initialAmount,
+            if (notes != null && notes.isNotEmpty) 'notes': notes,
+          },
         },
-      });
+      );
       return CashSession.fromJson(_unwrap(response.data));
     } on DioException catch (e) {
       throw dioErrorMessage(e);
@@ -63,8 +66,10 @@ class PosRepository {
 
   Future<Product> scanProduct(String barcode) async {
     try {
-      final response =
-          await _dio.get('/mobile/scan_product', queryParameters: {'barcode': barcode});
+      final response = await _dio.get(
+        '/mobile/scan_product',
+        queryParameters: {'barcode': barcode},
+      );
       return Product.fromJson(_unwrap(response.data));
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) throw 'Producto no encontrado';

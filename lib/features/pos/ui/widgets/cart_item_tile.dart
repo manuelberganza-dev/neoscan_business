@@ -33,8 +33,11 @@ class CartItemTile extends StatelessWidget {
               color: AppColors.background,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.inventory_2_outlined,
-                size: 22, color: AppColors.textLight),
+            child: const Icon(
+              Icons.inventory_2_outlined,
+              size: 22,
+              color: AppColors.textLight,
+            ),
           ),
           const SizedBox(width: 10),
           // Name + price
@@ -45,14 +48,18 @@ class CartItemTile extends StatelessWidget {
                 Text(
                   item.product.name,
                   style: const TextStyle(
-                      fontWeight: FontWeight.w500, fontSize: 14),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   formatCurrency(item.product.price),
                   style: const TextStyle(
-                      color: AppColors.textSecondary, fontSize: 12),
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -72,7 +79,9 @@ class CartItemTile extends StatelessWidget {
                 child: Text(
                   'x${item.quantity}',
                   style: const TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 14),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
               ),
               _qtyBtn(Icons.add, () => onQuantityChanged(item.quantity + 1)),
@@ -83,9 +92,10 @@ class CartItemTile extends StatelessWidget {
           Text(
             formatCurrency(item.lineTotal),
             style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: AppColors.textPrimary),
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: AppColors.textPrimary,
+            ),
           ),
         ],
       ),

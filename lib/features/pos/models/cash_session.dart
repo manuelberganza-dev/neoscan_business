@@ -36,7 +36,8 @@ class CashSession {
       id: json['id'] as int,
       initialAmount: _parseDouble(json['initial_amount'] ?? 0) ?? 0.0,
       status: json['status'] as String? ?? 'open',
-      openedAt: DateTime.tryParse(json['opened_at']?.toString() ?? '') ??
+      openedAt:
+          DateTime.tryParse(json['opened_at']?.toString() ?? '') ??
           DateTime.now(),
       registerName: register is Map ? register['name'] as String? : null,
       branchName: branch is Map ? branch['name'] as String? : null,

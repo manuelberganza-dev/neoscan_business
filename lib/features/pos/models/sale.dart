@@ -20,16 +20,18 @@ class SaleRequest {
   });
 
   Map<String, dynamic> toJson() => {
-        'sale': {
-          'cash_session_id': cashSessionId,
-          'items': items
-              .map((i) => {
-                    'product_id': i.product.id,
-                    'quantity': i.quantity,
-                    'unit_price': i.product.price,
-                  })
-              .toList(),
-          'payments': payments.map((p) => p.toJson()).toList(),
-        }
-      };
+    'sale': {
+      'cash_session_id': cashSessionId,
+      'items': items
+          .map(
+            (i) => {
+              'product_id': i.product.id,
+              'quantity': i.quantity,
+              'unit_price': i.product.price,
+            },
+          )
+          .toList(),
+      'payments': payments.map((p) => p.toJson()).toList(),
+    },
+  };
 }

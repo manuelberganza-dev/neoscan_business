@@ -10,8 +10,8 @@ class MoreScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authViewModelProvider).valueOrNull;
-    final session = ref.watch(cashSessionProvider).valueOrNull;
+    final user = ref.watch(currentUserProvider);
+    final session = ref.watch(cashSessionProvider).value;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Más')),
@@ -32,9 +32,10 @@ class MoreScreen extends ConsumerWidget {
                           ? user!.name[0].toUpperCase()
                           : '?',
                       style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primary),
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -45,22 +46,30 @@ class MoreScreen extends ConsumerWidget {
                         Text(
                           user?.name ?? '—',
                           style: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 15),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
                         ),
                         if (user?.role != null)
-                          Text(user!.role!,
-                              style: const TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 13)),
+                          Text(
+                            user!.role!,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                            ),
+                          ),
                         if (user?.branch != null)
-                          Text(user!.branch!,
-                              style: const TextStyle(
-                                  color: AppColors.textLight, fontSize: 12)),
+                          Text(
+                            user!.branch!,
+                            style: const TextStyle(
+                              color: AppColors.textLight,
+                              fontSize: 12,
+                            ),
+                          ),
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right,
-                      color: AppColors.textLight),
+                  const Icon(Icons.chevron_right, color: AppColors.textLight),
                 ],
               ),
             ),
@@ -96,8 +105,9 @@ class MoreScreen extends ConsumerWidget {
                 context: context,
                 builder: (_) => AlertDialog(
                   title: const Text('Cerrar sesión'),
-                  content:
-                      const Text('¿Estás seguro que deseas cerrar sesión?'),
+                  content: const Text(
+                    '¿Estás seguro que deseas cerrar sesión?',
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
@@ -105,8 +115,10 @@ class MoreScreen extends ConsumerWidget {
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Salir',
-                          style: TextStyle(color: AppColors.danger)),
+                      child: const Text(
+                        'Salir',
+                        style: TextStyle(color: AppColors.danger),
+                      ),
                     ),
                   ],
                 ),
@@ -134,17 +146,23 @@ class MoreScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: Icon(icon, color: iconColor ?? AppColors.textSecondary),
-        title: Text(label,
-            style: TextStyle(
-                color: labelColor ?? AppColors.textPrimary,
-                fontWeight: FontWeight.w500)),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: labelColor ?? AppColors.textPrimary,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         subtitle: subtitle != null
-            ? Text(subtitle,
+            ? Text(
+                subtitle,
                 style: const TextStyle(
-                    color: AppColors.textLight, fontSize: 12))
+                  color: AppColors.textLight,
+                  fontSize: 12,
+                ),
+              )
             : null,
-        trailing:
-            const Icon(Icons.chevron_right, color: AppColors.textLight),
+        trailing: const Icon(Icons.chevron_right, color: AppColors.textLight),
         onTap: onTap,
       ),
     );

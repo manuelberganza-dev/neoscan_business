@@ -18,15 +18,15 @@ class AdjustmentRequest {
   });
 
   Map<String, dynamic> toJson() => {
-        'stock_movement': {
-          'product_id': productId,
-          'warehouse_id': warehouseId,
-          'movement_type': type == MovementType.entry ? 'entry' : 'exit',
-          'quantity': quantity,
-          'reason': reason,
-          if (notes != null && notes!.isNotEmpty) 'notes': notes,
-        },
-      };
+    'stock_movement': {
+      'product_id': productId,
+      'warehouse_id': warehouseId,
+      'movement_type': type == MovementType.entry ? 'entry' : 'exit',
+      'quantity': quantity,
+      'reason': reason,
+      if (notes != null && notes!.isNotEmpty) 'notes': notes,
+    },
+  };
 }
 
 class TransferRequest {
@@ -45,12 +45,12 @@ class TransferRequest {
   });
 
   Map<String, dynamic> toJson() => {
-        'transfer': {
-          'source_warehouse_id': sourceWarehouseId,
-          'destination_warehouse_id': destinationWarehouseId,
-          'product_id': productId,
-          'quantity': quantity,
-          if (notes != null && notes!.isNotEmpty) 'notes': notes,
-        },
-      };
+    'transfer': {
+      'source_warehouse_id': sourceWarehouseId,
+      'destination_warehouse_id': destinationWarehouseId,
+      'product_id': productId,
+      'quantity': quantity,
+      if (notes != null && notes!.isNotEmpty) 'notes': notes,
+    },
+  };
 }

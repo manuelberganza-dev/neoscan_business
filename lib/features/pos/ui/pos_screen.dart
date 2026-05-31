@@ -38,7 +38,9 @@ class _PosScreenState extends ConsumerState<PosScreen>
   }
 
   void _openScanner() {
-    _scannerCtrl = MobileScannerController(detectionSpeed: DetectionSpeed.noDuplicates);
+    _scannerCtrl = MobileScannerController(
+      detectionSpeed: DetectionSpeed.noDuplicates,
+    );
     setState(() => _showScanner = true);
   }
 
@@ -80,7 +82,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final session = sessionAsync.valueOrNull;
+    final session = sessionAsync.value;
 
     // Loaded with no active session → go open one
     if (session == null && sessionAsync is AsyncData) {
@@ -146,8 +148,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
                       )
                     : const Icon(Icons.search, color: AppColors.textLight),
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.qr_code_scanner_rounded,
-                      color: AppColors.primary),
+                  icon: const Icon(
+                    Icons.qr_code_scanner_rounded,
+                    color: AppColors.primary,
+                  ),
                   onPressed: _openScanner,
                 ),
               ),
@@ -164,8 +168,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
               children: [
                 // Teclado tab
                 const Center(
-                  child: Text('Teclado numérico',
-                      style: TextStyle(color: AppColors.textLight)),
+                  child: Text(
+                    'Teclado numérico',
+                    style: TextStyle(color: AppColors.textLight),
+                  ),
                 ),
                 // Carrito tab
                 cart.items.isEmpty
@@ -187,8 +193,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
                       ),
                 // Clientes tab
                 const Center(
-                  child: Text('Selección de clientes',
-                      style: TextStyle(color: AppColors.textLight)),
+                  child: Text(
+                    'Selección de clientes',
+                    style: TextStyle(color: AppColors.textLight),
+                  ),
                 ),
               ],
             ),
@@ -205,8 +213,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Limpiar carrito'),
-        content:
-            const Text('¿Eliminar todos los productos del carrito?'),
+        content: const Text('¿Eliminar todos los productos del carrito?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -217,8 +224,10 @@ class _PosScreenState extends ConsumerState<PosScreen>
               ref.read(cartProvider.notifier).clear();
               Navigator.pop(context);
             },
-            child: const Text('Limpiar',
-                style: TextStyle(color: AppColors.danger)),
+            child: const Text(
+              'Limpiar',
+              style: TextStyle(color: AppColors.danger),
+            ),
           ),
         ],
       ),
@@ -250,15 +259,17 @@ class _SummaryBar extends ConsumerWidget {
           Row(
             children: [
               OutlinedButton(
-                onPressed: () =>
-                    ref.read(cartProvider.notifier).clear(),
+                onPressed: () => ref.read(cartProvider.notifier).clear(),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.danger,
                   side: const BorderSide(color: AppColors.danger),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 14),
+                    horizontal: 20,
+                    vertical: 14,
+                  ),
                 ),
                 child: const Icon(Icons.close),
               ),
@@ -270,12 +281,15 @@ class _SummaryBar extends ConsumerWidget {
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   child: Text(
                     'Pagar ${formatCurrency(cart.total)}',
                     style: const TextStyle(
-                        fontWeight: FontWeight.w700, fontSize: 16),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
@@ -290,18 +304,20 @@ class _SummaryBar extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label,
-            style: TextStyle(
-                color: bold
-                    ? AppColors.textPrimary
-                    : AppColors.textSecondary,
-                fontWeight:
-                    bold ? FontWeight.w600 : FontWeight.normal)),
-        Text(value,
-            style: TextStyle(
-                fontWeight:
-                    bold ? FontWeight.w700 : FontWeight.normal,
-                fontSize: bold ? 16 : 14)),
+        Text(
+          label,
+          style: TextStyle(
+            color: bold ? AppColors.textPrimary : AppColors.textSecondary,
+            fontWeight: bold ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontWeight: bold ? FontWeight.w700 : FontWeight.normal,
+            fontSize: bold ? 16 : 14,
+          ),
+        ),
       ],
     );
   }
@@ -316,17 +332,24 @@ class _EmptyCart extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.shopping_cart_outlined,
-              size: 56, color: AppColors.textLight),
+          Icon(
+            Icons.shopping_cart_outlined,
+            size: 56,
+            color: AppColors.textLight,
+          ),
           SizedBox(height: 12),
-          Text('El carrito está vacío',
-              style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w500)),
+          Text(
+            'El carrito está vacío',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           SizedBox(height: 6),
-          Text('Escanea un código o busca un producto',
-              style:
-                  TextStyle(color: AppColors.textLight, fontSize: 13)),
+          Text(
+            'Escanea un código o busca un producto',
+            style: TextStyle(color: AppColors.textLight, fontSize: 13),
+          ),
         ],
       ),
     );
@@ -363,8 +386,7 @@ class _ScannerOverlay extends StatelessWidget {
               width: 260,
               height: 200,
               decoration: BoxDecoration(
-                border:
-                    Border.all(color: AppColors.primary, width: 3),
+                border: Border.all(color: AppColors.primary, width: 3),
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
@@ -385,8 +407,7 @@ class _ScannerOverlay extends StatelessWidget {
             child: Text(
               'Apunta la cámara al código de barras',
               textAlign: TextAlign.center,
-              style:
-                  TextStyle(color: Colors.white, fontSize: 14),
+              style: TextStyle(color: Colors.white, fontSize: 14),
             ),
           ),
         ],
@@ -394,4 +415,3 @@ class _ScannerOverlay extends StatelessWidget {
     );
   }
 }
-

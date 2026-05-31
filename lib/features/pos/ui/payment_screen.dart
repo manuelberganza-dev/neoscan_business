@@ -35,14 +35,15 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
 
   Future<void> _confirm() async {
     final cart = ref.read(cartProvider);
-    final session = ref.read(cashSessionProvider).valueOrNull;
+    final session = ref.read(cashSessionProvider).value;
     if (session == null) return;
 
     if (_paidTotal < cart.total - 0.001) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              'Monto insuficiente. Faltan ${formatCurrency(cart.total - _paidTotal)}'),
+            'Monto insuficiente. Faltan ${formatCurrency(cart.total - _paidTotal)}',
+          ),
           backgroundColor: AppColors.danger,
           behavior: SnackBarBehavior.floating,
         ),
@@ -51,18 +52,14 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     }
 
     final payments = <SalePayment>[
-      if (_cashAmount > 0)
-        SalePayment(method: 'cash', amount: _cashAmount),
-      if (_cardAmount > 0)
-        SalePayment(method: 'card', amount: _cardAmount),
-      if (_otherAmount > 0)
-        SalePayment(method: 'other', amount: _otherAmount),
+      if (_cashAmount > 0) SalePayment(method: 'cash', amount: _cashAmount),
+      if (_cardAmount > 0) SalePayment(method: 'card', amount: _cardAmount),
+      if (_otherAmount > 0) SalePayment(method: 'other', amount: _otherAmount),
     ];
 
-    final ok = await ref.read(cartProvider.notifier).processSale(
-          cashSessionId: session.id,
-          payments: payments,
-        );
+    final ok = await ref
+        .read(cartProvider.notifier)
+        .processSale(cashSessionId: session.id, payments: payments);
 
     if (!mounted) return;
     if (ok) {
@@ -110,17 +107,21 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Total a pagar',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textSecondary)),
+                    const Text(
+                      'Total a pagar',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
                     Text(
                       formatCurrency(cart.total),
                       style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.success),
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.success,
+                      ),
                     ),
                   ],
                 ),
@@ -170,22 +171,29 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             _changeCard(_paidTotal - cart.total),
             const SizedBox(height: 32),
             ElevatedButton(
-              onPressed:
-                  cart.isProcessing ? null : _confirm,
+              onPressed: cart.isProcessing ? null : _confirm,
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(52),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               child: cart.isProcessing
                   ? const SizedBox(
                       width: 22,
                       height: 22,
                       child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2.5))
-                  : const Text('Confirmar pago',
+                        color: Colors.white,
+                        strokeWidth: 2.5,
+                      ),
+                    )
+                  : const Text(
+                      'Confirmar pago',
                       style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600)),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
             ),
           ],
         ),
@@ -199,33 +207,32 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       child: GestureDetector(
         onTap: () => setState(() => _activeMethod = method),
         child: Container(
-          padding:
-              const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
           decoration: BoxDecoration(
             color: active
                 ? AppColors.primary.withValues(alpha: 0.1)
                 : AppColors.surface,
             border: Border.all(
-                color: active ? AppColors.primary : AppColors.border),
+              color: active ? AppColors.primary : AppColors.border,
+            ),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
             children: [
-              Icon(icon,
-                  color: active
-                      ? AppColors.primary
-                      : AppColors.textSecondary,
-                  size: 20),
+              Icon(
+                icon,
+                color: active ? AppColors.primary : AppColors.textSecondary,
+                size: 20,
+              ),
               const SizedBox(height: 4),
-              Text(label,
-                  style: TextStyle(
-                      fontSize: 11,
-                      color: active
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
-                      fontWeight: active
-                          ? FontWeight.w600
-                          : FontWeight.normal)),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: active ? AppColors.primary : AppColors.textSecondary,
+                  fontWeight: active ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
             ],
           ),
         ),
@@ -234,26 +241,27 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   }
 
   Widget _changeCard(double change) => Card(
-        child: Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Cambio',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500, fontSize: 15)),
-              Text(
-                formatCurrency(change > 0 ? change : 0),
-                style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.success),
-              ),
-            ],
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Cambio',
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
           ),
-        ),
-      );
+          Text(
+            formatCurrency(change > 0 ? change : 0),
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: AppColors.success,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 
   Widget _amountRow({
     required IconData icon,
@@ -266,30 +274,31 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
         children: [
-          Icon(icon,
-              color: active
-                  ? AppColors.primary
-                  : AppColors.textSecondary,
-              size: 20),
+          Icon(
+            icon,
+            color: active ? AppColors.primary : AppColors.textSecondary,
+            size: 20,
+          ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(label,
-                style: TextStyle(
-                    color: active
-                        ? AppColors.textPrimary
-                        : AppColors.textSecondary,
-                    fontWeight: active ? FontWeight.w500 : FontWeight.normal)),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: active ? AppColors.textPrimary : AppColors.textSecondary,
+                fontWeight: active ? FontWeight.w500 : FontWeight.normal,
+              ),
+            ),
           ),
           SizedBox(
             width: 110,
             child: TextField(
               controller: controller,
               textAlign: TextAlign.right,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(
-                    RegExp(r'^\d+\.?\d{0,2}'))
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],
               onChanged: (_) => setState(() {}),
               decoration: const InputDecoration(
@@ -299,8 +308,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
                 filled: false,
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 12),
+                contentPadding: EdgeInsets.symmetric(vertical: 12),
               ),
             ),
           ),

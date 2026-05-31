@@ -18,16 +18,16 @@ class Product {
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
-        id: json['id'] as int,
-        name: json['name'] as String,
-        sku: (json['sku'] ?? json['barcode'] ?? '') as String,
-        price: _parseDouble(json['price'] ?? json['sale_price'] ?? 0),
-        imageUrl: json['image_url'] as String?,
-        category: json['category'] is Map
-            ? json['category']['name'] as String?
-            : json['category'] as String?,
-        stock: json['stock'] as int?,
-      );
+    id: json['id'] as int,
+    name: json['name'] as String,
+    sku: (json['sku'] ?? json['barcode'] ?? '') as String,
+    price: _parseDouble(json['price'] ?? json['sale_price'] ?? 0),
+    imageUrl: json['image_url'] as String?,
+    category: json['category'] is Map
+        ? json['category']['name'] as String?
+        : json['category'] as String?,
+    stock: json['stock'] as int?,
+  );
 
   static double _parseDouble(dynamic value) {
     if (value is double) return value;

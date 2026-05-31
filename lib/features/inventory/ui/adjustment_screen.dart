@@ -55,7 +55,8 @@ class _AdjustmentScreenState extends ConsumerState<AdjustmentScreen> {
 
   Future<void> _submit() async {
     final item = _selectedItem;
-    final warehouse = _selectedWarehouse ??
+    final warehouse =
+        _selectedWarehouse ??
         (item != null
             ? Warehouse(id: item.warehouseId, name: item.warehouseName)
             : null);
@@ -74,14 +75,18 @@ class _AdjustmentScreenState extends ConsumerState<AdjustmentScreen> {
       return;
     }
 
-    final ok = await ref.read(adjustmentViewModelProvider.notifier).submit(
+    final ok = await ref
+        .read(adjustmentViewModelProvider.notifier)
+        .submit(
           AdjustmentRequest(
             productId: item.productId,
             warehouseId: warehouse.id,
             type: _type,
             quantity: qty,
             reason: _selectedReason,
-            notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+            notes: _notesCtrl.text.trim().isEmpty
+                ? null
+                : _notesCtrl.text.trim(),
           ),
         );
 
@@ -96,7 +101,8 @@ class _AdjustmentScreenState extends ConsumerState<AdjustmentScreen> {
       );
       context.pop();
     } else {
-      final err = ref.read(adjustmentViewModelProvider).error?.toString() ??
+      final err =
+          ref.read(adjustmentViewModelProvider).error?.toString() ??
           'Error al guardar el ajuste';
       _showError(err);
     }
@@ -117,11 +123,10 @@ class _AdjustmentScreenState extends ConsumerState<AdjustmentScreen> {
   Widget build(BuildContext context) {
     final warehousesAsync = ref.watch(warehousesProvider);
     final inventoryAsync = ref.watch(inventoryProvider);
-    final isLoading =
-        ref.watch(adjustmentViewModelProvider) is AsyncLoading;
+    final isLoading = ref.watch(adjustmentViewModelProvider) is AsyncLoading;
 
-    final warehouses = warehousesAsync.valueOrNull ?? [];
-    final items = inventoryAsync.valueOrNull ?? [];
+    final warehouses = warehousesAsync.value ?? [];
+    final items = inventoryAsync.value ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -148,8 +153,10 @@ class _AdjustmentScreenState extends ConsumerState<AdjustmentScreen> {
                 onChanged: (i) => setState(() {
                   _selectedItem = i;
                   if (i != null) {
-                    _selectedWarehouse =
-                        Warehouse(id: i.warehouseId, name: i.warehouseName);
+                    _selectedWarehouse = Warehouse(
+                      id: i.warehouseId,
+                      name: i.warehouseName,
+                    );
                   }
                 }),
               ),
@@ -172,11 +179,19 @@ class _AdjustmentScreenState extends ConsumerState<AdjustmentScreen> {
               title: 'Tipo de ajuste',
               child: Row(
                 children: [
-                  _typeButton(MovementType.entry, 'Entrada',
-                      const Color(0xFFDCFCE7), const Color(0xFF16A34A)),
+                  _typeButton(
+                    MovementType.entry,
+                    'Entrada',
+                    const Color(0xFFDCFCE7),
+                    const Color(0xFF16A34A),
+                  ),
                   const SizedBox(width: 10),
-                  _typeButton(MovementType.exit, 'Salida',
-                      const Color(0xFFFEE2E2), const Color(0xFFDC2626)),
+                  _typeButton(
+                    MovementType.exit,
+                    'Salida',
+                    const Color(0xFFFEE2E2),
+                    const Color(0xFFDC2626),
+                  ),
                 ],
               ),
             ),
@@ -197,7 +212,9 @@ class _AdjustmentScreenState extends ConsumerState<AdjustmentScreen> {
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.w700),
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                      ),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
@@ -257,8 +274,7 @@ class _AdjustmentScreenState extends ConsumerState<AdjustmentScreen> {
     );
   }
 
-  Widget _typeButton(
-      MovementType type, String label, Color bg, Color fg) {
+  Widget _typeButton(MovementType type, String label, Color bg, Color fg) {
     final active = _type == type;
     return Expanded(
       child: GestureDetector(
@@ -356,26 +372,31 @@ class _SearchableDropdown<T> extends StatelessWidget {
       child: DropdownButton<T>(
         value: value,
         isExpanded: true,
-        hint: Text(hint,
-            style: const TextStyle(color: AppColors.textLight)),
+        hint: Text(hint, style: const TextStyle(color: AppColors.textLight)),
         items: items
-            .map((item) => DropdownMenuItem<T>(
-                  value: item,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(labelBuilder(item),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w500)),
-                      if (subtitleBuilder != null)
-                        Text(subtitleBuilder!(item),
-                            style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textLight)),
-                    ],
-                  ),
-                ))
+            .map(
+              (item) => DropdownMenuItem<T>(
+                value: item,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      labelBuilder(item),
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    if (subtitleBuilder != null)
+                      Text(
+                        subtitleBuilder!(item),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textLight,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            )
             .toList(),
         onChanged: onChanged,
       ),

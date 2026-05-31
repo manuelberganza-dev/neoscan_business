@@ -31,9 +31,7 @@ class InventoryRepository {
     try {
       final response = await _dio.get(
         '/inventory',
-        queryParameters: {
-          'warehouse_id': warehouseId,
-        },
+        queryParameters: {'warehouse_id': warehouseId},
       );
       final list = _unwrapList(response.data);
       return list.map((j) => InventoryItem.fromJson(j)).toList();

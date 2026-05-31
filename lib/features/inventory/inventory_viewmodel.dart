@@ -6,9 +6,10 @@ import 'models/warehouse.dart';
 
 // ── Warehouses (loaded once) ──────────────────────────────────────────────────
 
-final warehousesProvider = AsyncNotifierProvider<WarehousesViewModel, List<Warehouse>>(
-  WarehousesViewModel.new,
-);
+final warehousesProvider =
+    AsyncNotifierProvider<WarehousesViewModel, List<Warehouse>>(
+      WarehousesViewModel.new,
+    );
 
 class WarehousesViewModel extends AsyncNotifier<List<Warehouse>> {
   @override
@@ -25,14 +26,26 @@ class WarehousesViewModel extends AsyncNotifier<List<Warehouse>> {
 
 // ── Selected warehouse filter ─────────────────────────────────────────────────
 
-final selectedWarehouseProvider = StateProvider<Warehouse?>((ref) => null);
+final selectedWarehouseProvider =
+    NotifierProvider<SelectedWarehouseViewModel, Warehouse?>(
+      SelectedWarehouseViewModel.new,
+    );
+
+class SelectedWarehouseViewModel extends Notifier<Warehouse?> {
+  @override
+  Warehouse? build() => null;
+
+  void select(Warehouse? warehouse) {
+    state = warehouse;
+  }
+}
 
 // ── Inventory list (reacts to warehouse filter) ───────────────────────────────
 
 final inventoryProvider =
     AsyncNotifierProvider<InventoryViewModel, List<InventoryItem>>(
-  InventoryViewModel.new,
-);
+      InventoryViewModel.new,
+    );
 
 class InventoryViewModel extends AsyncNotifier<List<InventoryItem>> {
   @override
@@ -59,8 +72,8 @@ class InventoryViewModel extends AsyncNotifier<List<InventoryItem>> {
 
 final adjustmentViewModelProvider =
     NotifierProvider<AdjustmentViewModel, AsyncValue<void>>(
-  AdjustmentViewModel.new,
-);
+      AdjustmentViewModel.new,
+    );
 
 class AdjustmentViewModel extends Notifier<AsyncValue<void>> {
   @override
@@ -83,8 +96,8 @@ class AdjustmentViewModel extends Notifier<AsyncValue<void>> {
 
 final transferViewModelProvider =
     NotifierProvider<TransferViewModel, AsyncValue<void>>(
-  TransferViewModel.new,
-);
+      TransferViewModel.new,
+    );
 
 class TransferViewModel extends Notifier<AsyncValue<void>> {
   @override

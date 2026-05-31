@@ -32,7 +32,9 @@ class _OpenCashScreenState extends ConsumerState<OpenCashScreen> {
       );
       return;
     }
-    await ref.read(cashSessionProvider.notifier).open(
+    await ref
+        .read(cashSessionProvider.notifier)
+        .open(
           amount,
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
         );
@@ -71,8 +73,11 @@ class _OpenCashScreenState extends ConsumerState<OpenCashScreen> {
             _sectionCard(
               title: 'Información de caja',
               children: [
-                _infoRow(Icons.point_of_sale_outlined, 'Caja',
-                    'Caja 1 - Principal'),
+                _infoRow(
+                  Icons.point_of_sale_outlined,
+                  'Caja',
+                  'Caja 1 - Principal',
+                ),
                 const Divider(),
                 _infoRow(Icons.store_outlined, 'Sucursal', 'Sucursal Centro'),
               ],
@@ -83,22 +88,26 @@ class _OpenCashScreenState extends ConsumerState<OpenCashScreen> {
               children: [
                 TextField(
                   controller: _amountCtrl,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(
-                        RegExp(r'^\d+\.?\d{0,2}')),
+                      RegExp(r'^\d+\.?\d{0,2}'),
+                    ),
                   ],
                   style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary),
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
                   decoration: const InputDecoration(
                     prefixText: '\$ ',
                     prefixStyle: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary),
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
@@ -137,22 +146,22 @@ class _OpenCashScreenState extends ConsumerState<OpenCashScreen> {
     );
   }
 
-  Widget _sectionCard({
-    required String title,
-    required List<Widget> children,
-  }) {
+  Widget _sectionCard({required String title, required List<Widget> children}) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-                style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
-                    letterSpacing: 0.5)),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+                letterSpacing: 0.5,
+              ),
+            ),
             const SizedBox(height: 12),
             ...children,
           ],
@@ -169,13 +178,18 @@ class _OpenCashScreenState extends ConsumerState<OpenCashScreen> {
           Icon(icon, size: 18, color: AppColors.textSecondary),
           const SizedBox(width: 10),
           Expanded(
-              child: Text(label,
-                  style:
-                      const TextStyle(color: AppColors.textSecondary))),
-          Text(value,
-              style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary)),
+            child: Text(
+              label,
+              style: const TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
+          ),
         ],
       ),
     );

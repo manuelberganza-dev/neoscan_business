@@ -33,7 +33,11 @@ class _QuantitySheetState extends State<_QuantitySheet> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.fromLTRB(
-          24, 20, 24, MediaQuery.of(context).viewInsets.bottom + 24),
+        24,
+        20,
+        24,
+        MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -57,20 +61,30 @@ class _QuantitySheetState extends State<_QuantitySheet> {
                   color: AppColors.background,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.inventory_2_outlined,
-                    color: AppColors.textLight),
+                child: const Icon(
+                  Icons.inventory_2_outlined,
+                  color: AppColors.textLight,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.product.name,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 15)),
-                    Text(formatCurrency(widget.product.price),
-                        style: const TextStyle(
-                            color: AppColors.textSecondary, fontSize: 13)),
+                    Text(
+                      widget.product.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
+                    ),
+                    Text(
+                      formatCurrency(widget.product.price),
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -91,7 +105,9 @@ class _QuantitySheetState extends State<_QuantitySheet> {
               Text(
                 '$_quantity',
                 style: const TextStyle(
-                    fontSize: 32, fontWeight: FontWeight.w700),
+                  fontSize: 32,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const SizedBox(width: 32),
               _circleButton(
@@ -105,7 +121,9 @@ class _QuantitySheetState extends State<_QuantitySheet> {
           Text(
             'Total: ${formatCurrency(total)}',
             style: const TextStyle(
-                color: AppColors.textSecondary, fontSize: 13),
+              color: AppColors.textSecondary,
+              fontSize: 13,
+            ),
           ),
           const SizedBox(height: 28),
           SizedBox(
@@ -113,9 +131,10 @@ class _QuantitySheetState extends State<_QuantitySheet> {
             height: 52,
             child: ElevatedButton(
               onPressed: () => Navigator.pop(context, _quantity),
-              child: const Text('Agregar al carrito',
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600)),
+              child: const Text(
+                'Agregar al carrito',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
             ),
           ),
         ],
@@ -140,8 +159,11 @@ class _QuantitySheetState extends State<_QuantitySheet> {
               ? null
               : Border.all(color: AppColors.border, width: 1.5),
         ),
-        child: Icon(icon,
-            color: filled ? Colors.white : AppColors.textPrimary, size: 22),
+        child: Icon(
+          icon,
+          color: filled ? Colors.white : AppColors.textPrimary,
+          size: 22,
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../features/auth/auth_viewmodel.dart';
 import '../../features/auth/ui/login_screen.dart';
 import '../../features/home/ui/home_screen.dart';
@@ -17,73 +18,55 @@ import '../../shared/theme/app_theme.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final notifier = _RouterRefresh(ref);
+  ref.onDispose(notifier.dispose);
+
   return GoRouter(
     initialLocation: '/login',
     refreshListenable: notifier,
     redirect: (context, state) {
       final authState = ref.read(authViewModelProvider);
-      final loc = state.matchedLocation;
+      final location = state.matchedLocation;
 
-      // Still initializing — don't redirect
-      if (authState is AsyncLoading) return null;
+      if (authState.isLoading) return null;
 
-      final user = authState.valueOrNull;
-      final onLogin = loc == '/login';
+      final isAuthenticated = authState.value?.isAuthenticated ?? false;
+      final isLoginRoute = location == '/login';
 
-      if (user == null && !onLogin) return '/login';
-      if (user != null && onLogin) return '/home';
+      if (!isAuthenticated && !isLoginRoute) return '/login';
+      if (isAuthenticated && isLoginRoute) return '/home';
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        builder: (ctx, _) => const LoginScreen(),
-      ),
-      // Full-screen Inventory sub-routes (no bottom nav)
+      GoRoute(path: '/login', builder: (ctx, _) => const LoginScreen()),
       GoRoute(
         path: '/inventory/adjustment',
-        builder: (ctx, state) => AdjustmentScreen(
-          preselectedItem: state.extra as InventoryItem?,
-        ),
+        builder: (ctx, state) =>
+            AdjustmentScreen(preselectedItem: state.extra as InventoryItem?),
       ),
       GoRoute(
         path: '/inventory/transfer',
         builder: (ctx, _) => const TransferScreen(),
       ),
-      // Full-screen POS sub-routes (no bottom nav)
       GoRoute(
         path: '/pos/open-cash',
         builder: (ctx, _) => const OpenCashScreen(),
       ),
-      GoRoute(
-        path: '/pos/payment',
-        builder: (ctx, _) => const PaymentScreen(),
-      ),
+      GoRoute(path: '/pos/payment', builder: (ctx, _) => const PaymentScreen()),
       GoRoute(
         path: '/pos/close-cash',
         builder: (ctx, _) => const CloseCashScreen(),
       ),
-      // Shell with bottom navigation
       ShellRoute(
         builder: (context, state, child) =>
             _MainShell(location: state.matchedLocation, child: child),
         routes: [
-          GoRoute(
-            path: '/home',
-            builder: (ctx, _) => const HomeScreen(),
-          ),
-          GoRoute(
-            path: '/pos',
-            builder: (ctx, _) => const PosScreen(),
-          ),
+          GoRoute(path: '/home', builder: (ctx, _) => const HomeScreen()),
+          GoRoute(path: '/pos', builder: (ctx, _) => const PosScreen()),
           GoRoute(
             path: '/inventory',
             builder: (ctx, _) => const InventoryScreen(),
           ),
-          GoRoute(
-            path: '/more',
-            builder: (ctx, _) => const MoreScreen(),
-          ),
+          GoRoute(path: '/more', builder: (ctx, _) => const MoreScreen()),
         ],
       ),
     ],
@@ -97,10 +80,10 @@ class _RouterRefresh extends ChangeNotifier {
 }
 
 class _MainShell extends StatelessWidget {
+  const _MainShell({required this.location, required this.child});
+
   final String location;
   final Widget child;
-
-  const _MainShell({required this.location, required this.child});
 
   int get _index {
     if (location.startsWith('/pos')) return 1;
