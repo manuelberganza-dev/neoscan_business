@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'models/ocr_document.dart';
 import 'models/scanned_product.dart';
 import 'scanner_repository.dart';
 
@@ -94,14 +95,14 @@ class OcrScannerState {
 
   final String? imagePath;
   final bool isUploading;
-  final OcrInvoiceResult? result;
+  final OcrScanResult? result;
   final String? jsonPreview;
   final String? error;
 
   OcrScannerState copyWith({
     String? imagePath,
     bool? isUploading,
-    OcrInvoiceResult? result,
+    OcrScanResult? result,
     String? jsonPreview,
     String? error,
     bool clearImage = false,
@@ -137,7 +138,7 @@ class OcrScannerViewModel extends Notifier<OcrScannerState> {
     try {
       final result = await ref
           .read(scannerRepositoryProvider)
-          .uploadInvoiceImage(imagePath);
+          .scanInvoicePhoto(imagePath);
       state = state.copyWith(
         isUploading: false,
         result: result,

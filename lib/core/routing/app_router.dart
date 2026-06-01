@@ -16,6 +16,7 @@ import '../../features/pos/ui/open_cash_screen.dart';
 import '../../features/pos/ui/payment_screen.dart';
 import '../../features/pos/ui/pos_screen.dart';
 import '../../features/scanner/ui/barcode_scanner_screen.dart';
+import '../../features/scanner/ui/ocr_review_screen.dart';
 import '../../features/scanner/ui/ocr_scanner_screen.dart';
 import '../../shared/theme/app_theme.dart';
 
@@ -66,6 +67,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/scanner/ocr',
         builder: (ctx, _) => const OcrScannerScreen(),
+      ),
+      GoRoute(
+        path: '/scanner/ocr/review',
+        builder: (ctx, state) {
+          final args = state.extra;
+          if (args is OcrReviewArgs) return OcrReviewScreen(args: args);
+          return const OcrScannerScreen();
+        },
       ),
       GoRoute(
         path: '/notifications',

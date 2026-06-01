@@ -1,19 +1,25 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/network/dio_client.dart';
+import '../../core/security/token_storage.dart';
+import 'models/ocr_document.dart';
 import 'models/scanned_product.dart';
 
 final scannerRepositoryProvider = Provider<ScannerRepository>((ref) {
-  return ScannerRepository(ref.watch(dioClientProvider));
+  return ScannerRepository(
+    ref.watch(dioClientProvider),
+    ref.watch(tokenStorageProvider),
+  );
 });
 
 class ScannerRepository {
-  const ScannerRepository(this._dio);
+  const ScannerRepository(this._dio, this._tokenStorage);
+
+  static const _ocrTimeout = Duration(minutes: 3);
 
   final Dio _dio;
+  final TokenStorage _tokenStorage;
 
   Future<ScannedProduct> scanProduct({
     required String barcode,
@@ -36,26 +42,44 @@ class ScannerRepository {
     }
   }
 
-  Future<OcrInvoiceResult> uploadInvoiceImage(String imagePath) async {
+  Future<OcrScanResult> scanInvoicePhoto(String imagePath) async {
     try {
       final formData = FormData.fromMap({
-        'image': await MultipartFile.fromFile(
+        'scan[photo]': await MultipartFile.fromFile(
           imagePath,
           filename: _fileNameFor(imagePath),
         ),
       });
 
       final response = await _dio.post(
-        '/mobile/ocr_invoice',
+        '/mobile/ocr/scan',
         data: formData,
-        options: Options(contentType: 'multipart/form-data'),
+        options: Options(
+          contentType: 'multipart/form-data',
+          sendTimeout: _ocrTimeout,
+          receiveTimeout: _ocrTimeout,
+          headers: await _authHeaders(),
+        ),
       );
 
-      return OcrInvoiceResult.fromJson(_unwrap(response.data));
+      return OcrScanResult.fromJson(_unwrap(response.data));
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
-        throw 'El endpoint de OCR no está disponible en el backend.';
+        throw 'El endpoint de OCR no esta disponible en el backend.';
       }
+      throw dioErrorMessage(e);
+    }
+  }
+
+  Future<OcrDocumentDraft> saveOcrDocument(OcrDocumentDraft document) async {
+    try {
+      final response = await _dio.post(
+        '/mobile/ocr/documents',
+        data: {'ocr_document': document.toJson()},
+      );
+      final data = _unwrap(response.data);
+      return OcrDocumentDraft.fromJson(_unwrap(data['ocr_document']));
+    } on DioException catch (e) {
       throw dioErrorMessage(e);
     }
   }
@@ -66,49 +90,14 @@ class ScannerRepository {
     return const {};
   }
 
-  String _fileNameFor(String path) => path.split(RegExp(r'[\\/]')).last;
-}
+  Future<Map<String, String>> _authHeaders() async {
+    final token = await _tokenStorage.read();
+    if (token == null || token.isEmpty) {
+      return const {'Accept': 'application/json'};
+    }
 
-class OcrInvoiceResult {
-  const OcrInvoiceResult({
-    this.purchaseId,
-    this.invoiceNumber,
-    this.message,
-    this.jsonText = '{}',
-    this.raw = const {},
-  });
-
-  final int? purchaseId;
-  final String? invoiceNumber;
-  final String? message;
-  final String jsonText;
-  final Map<String, dynamic> raw;
-
-  factory OcrInvoiceResult.fromJson(Map<String, dynamic> json) {
-    final purchase = json['purchase'] is Map
-        ? Map<String, dynamic>.from(json['purchase'] as Map)
-        : const <String, dynamic>{};
-
-    return OcrInvoiceResult(
-      purchaseId: _parseInt(purchase['id'] ?? json['purchase_id']),
-      invoiceNumber:
-          (purchase['invoice_number'] ??
-                  json['invoice_number'] ??
-                  json['document_number'])
-              as String?,
-      message: json['message'] as String?,
-      jsonText: _prettyJson(json),
-      raw: json,
-    );
+    return {'Accept': 'application/json', 'Authorization': 'Bearer $token'};
   }
-}
 
-String _prettyJson(Map<String, dynamic> json) {
-  return const JsonEncoder.withIndent('  ').convert(json);
-}
-
-int? _parseInt(dynamic value) {
-  if (value == null) return null;
-  if (value is int) return value;
-  return int.tryParse(value.toString());
+  String _fileNameFor(String path) => path.split(RegExp(r'[\\/]')).last;
 }

@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../shared/theme/app_theme.dart';
 import '../scanner_viewmodel.dart';
+import 'ocr_review_screen.dart';
 
 class OcrScannerScreen extends ConsumerStatefulWidget {
   const OcrScannerScreen({super.key});
@@ -32,10 +34,22 @@ class _OcrScannerScreenState extends ConsumerState<OcrScannerScreen> {
     final ok = await ref.read(ocrScannerProvider.notifier).upload();
     if (!mounted || !ok) return;
 
+    final state = ref.read(ocrScannerProvider);
+    final result = state.result;
+    if (result == null) return;
+
+    final saved = await context.push<bool>(
+      '/scanner/ocr/review',
+      extra: OcrReviewArgs(result: result, imagePath: state.imagePath),
+    );
+
+    if (!mounted || saved != true) return;
+    ref.read(ocrScannerProvider.notifier).clear();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Lectura OCR completada'),
+        content: Text('Lectura guardada correctamente'),
         behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.success,
       ),
     );
   }
@@ -77,7 +91,7 @@ class _OcrScannerScreenState extends ConsumerState<OcrScannerScreen> {
                       ? null
                       : () => _pick(ImageSource.gallery),
                   icon: const Icon(Icons.photo_library_outlined),
-                  label: const Text('Galería'),
+                  label: const Text('Galeria'),
                 ),
               ),
               const SizedBox(width: 12),
@@ -87,7 +101,7 @@ class _OcrScannerScreenState extends ConsumerState<OcrScannerScreen> {
                       ? null
                       : () => _pick(ImageSource.camera),
                   icon: const Icon(Icons.photo_camera_outlined),
-                  label: const Text('Cámara'),
+                  label: const Text('Camara'),
                 ),
               ),
             ],
@@ -119,12 +133,10 @@ class _OcrScannerScreenState extends ConsumerState<OcrScannerScreen> {
           ],
           if (state.result != null) ...[
             const SizedBox(height: 12),
-            _MessageBox(
+            const _MessageBox(
               icon: Icons.check_circle_outline_rounded,
               color: AppColors.success,
-              text:
-                  state.result!.message ??
-                  'Imagen procesada${state.result!.invoiceNumber != null ? ': ${state.result!.invoiceNumber}' : ''}',
+              text: 'Imagen procesada. Revisa los campos antes de guardar.',
             ),
           ],
         ],
